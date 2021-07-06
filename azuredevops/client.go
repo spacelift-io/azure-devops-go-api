@@ -72,6 +72,20 @@ func NewClient(connection *Connection, baseUrl string) *Client {
 	}
 }
 
+func NewClientWithOptions(connection *Connection, baseUrl string, options ...ClientOptionFunc) *Client {
+	c := NewClient(connection, baseUrl)
+
+	// Apply any given client options.
+	for _, fn := range options {
+		if fn == nil {
+			continue
+		}
+		fn(c)
+	}
+
+	return c
+}
+
 type Client struct {
 	baseUrl                 string
 	client                  *http.Client

@@ -274,6 +274,25 @@ func NewClient(ctx context.Context, connection *azuredevops.Connection) (Client,
 	}, nil
 }
 
+func NewClientWithOptions(ctx context.Context, connection *azuredevops.Connection, options ...azuredevops.ClientOptionFunc) (Client, error) {
+	client, err := connection.GetClientByResourceAreaId(ctx, ResourceAreaId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Apply any given client options.
+	for _, fn := range options {
+		if fn == nil {
+			continue
+		}
+		fn(client)
+	}
+
+	return &ClientImpl{
+		Client: *client,
+	}, nil
+}
+
 // [Preview API] Create an annotated tag.
 func (client *ClientImpl) CreateAnnotatedTag(ctx context.Context, args CreateAnnotatedTagArgs) (*GitAnnotatedTag, error) {
 	if args.TagObject == nil {
